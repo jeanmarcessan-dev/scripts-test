@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# List all 100 hosts here
+HOSTS=(
+    "LBAS11-DMZ0-ECHNPO2"
+    "LBAS12-DMZ0-ECHNPO2"
+    # ... add all 100 hosts
+)
+
+echo "HOST,SELF_IP,VLAN,TRAFFIC_GROUP"
+
+for HOST in "${HOSTS[@]}"; do
+    ssh -n -o ConnectTimeout=30 "$HOST" "tmsh list net self" 2>/dev/null | \
+    awk -v h="$HOST" '
+    /net self/ { 
+        ip=$3; gsub(/{/, "", ip)
+        if ($0 ~ /VIP-/) ip="VIP:"ip
+    }
+    /vlan/ { v=$2; gsub(/{/, "", v) }
+    /traffic-group/ { t=$2; gsub(/{/, "", t); print h","ip","v","t }
+    '
+done
