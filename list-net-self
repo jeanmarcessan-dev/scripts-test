@@ -22,11 +22,8 @@ for HOST in "${HOSTS[@]}"; do
 done
 
 
-awk -v h="$HOST" '
-    /net self/ { 
-        ip=$3; gsub(/{/, "", ip)
-        if ($0 ~ /VIP-/) ip="VIP:"ip
-    }
-    /vlan/ { v=$2; gsub(/{/, "", v) }
-    /traffic-group/ { t=$2; gsub(/{/, "", t); print h","ip","v","t }
-    '
+ awk -v h="$HOST" '
+    /net self/ { name=$3 }
+    /address/ { addr=$2 }
+    /vlan/ { v=$2 }
+    /traffic-group/ { t=$2; print h","name","addr","v","t }'
