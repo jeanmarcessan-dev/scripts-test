@@ -27,3 +27,14 @@ done
     /address/ { addr=$2 }
     /vlan/ { v=$2 }
     /traffic-group/ { t=$2; print h","name","addr","v","t }'
+
+
+
+awk -v h="$HOST" '
+    /ltm virtual/ {
+        vs = $3
+        gsub(/{/, "", vs)
+    }
+    /context clientside/ {
+        print h","vs","$1
+    }'
